@@ -1,0 +1,16 @@
+#!/bin/sh
+
+xrdb ${XDG_CONFIG_HOME:-$HOME/.config}/x11/xresources 
+xrdb -merge ${XDG_CACHE_HOME:-$HOME/.cache}/wal/colors.Xresources 
+xwallpaper --zoom $WALLPAPER
+
+autostart="slstatus xcompmgr setbg"
+
+for program in $autostart; do
+	pidof -sx "$program" || "$program" &
+done >/dev/null 2>&1
+
+while true
+do
+	dwm
+done

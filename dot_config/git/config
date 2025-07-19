@@ -1,0 +1,8 @@
+[user]
+	name = mfrey
+	email = 156535827+mfreym@users.noreply.github.com
+	signingkey = /home/martin/.ssh/id_ed25519_odoo.pub
+[gpg]
+	format = ssh
+[commit]
+	gpgsign = true

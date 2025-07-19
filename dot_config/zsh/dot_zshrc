@@ -1,0 +1,58 @@
+#!/bin/zsh
+
+
+# Automatically cd into typed directory.
+setopt autocd
+# Disable ctrl-s to freeze terminal.
+stty stop undef
+
+# Restore the old behavior for Ctrl+a and Ctrl+e
+bindkey -e 
+#
+# Restore the old behavior for delete key
+bindkey "^[[3~" delete-char
+
+# History in cache directory:
+HISTSIZE=10000000
+SAVEHIST=10000000
+HISTFILE="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/history"
+setopt inc_append_history
+
+# Aliases delcaration.
+
+# Use neovim for vim if present.
+[ -x "$(command -v nvim)" ] && alias vim="nvim" vimdiff="nvim -d"
+
+# Verbosity and settings that you pretty much just always are going to want.
+alias \
+	cp="cp -iv" \
+	mv="mv -iv" \
+	rm="rm -vI" \
+	ffmpeg="ffmpeg -hide_banner"
+
+# Colorize commands when possible.
+alias \
+	ls="ls -hN --color=auto --group-directories-first" \
+	la="ls -hNa --color=auto --group-directories-first" \
+	grep="grep --color=auto" \
+	diff="diff --color=auto" \
+	ip="ip -color=auto"
+
+alias bctl="bluetoothctl"
+
+
+# Basic auto/tab complete:
+autoload -U compinit
+zstyle ':completion:*' menu select
+zstyle ':completion:*' rehash true
+zstyle ':completion:*' ignored-patterns '.*'
+zmodload zsh/complist
+compinit
+# Include hidden files.
+_comp_options+=(globdots)		
+
+# Enable colors and prompt:
+autoload -U colors && colors
+
+setopt PROMPT_SUBST
+PS1='%B%{$fg[red]%}[%{$fg[yellow]%}%n%{$fg[green]%}@%{$fg[blue]%}%M %{$fg[magenta]%}%~%{$fg[cyan]%}$(git branch --show-current 2> /dev/null | sed "s/^/ (/" | sed "s/$/)/")%{$fg[red]%}]%{$reset_color%}$%b '

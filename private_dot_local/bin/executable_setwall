@@ -1,0 +1,54 @@
+#!/bin/sh
+
+ZPROFILE="$HOME/.zprofile"
+
+# Check that exactly one argument is provided
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 /absolute/path/to/image"
+    exit 1
+fi
+
+IMAGE="$1"
+
+# Ensure the path is absolute
+case "$IMAGE" in
+    /*) ;;
+    *)
+        echo "Error: The path must be absolute."
+        exit 1
+        ;;
+esac
+
+# Check that the file exists
+if [ ! -f "$IMAGE" ]; then
+    echo "Error: File '$IMAGE' does not exist."
+    exit 1
+fi
+
+# Set the wallpaper using xwallpaper
+xwallpaper --zoom "$IMAGE" || {
+    echo "Error: xwallpaper failed."
+    exit 1
+}
+
+# Generate color scheme using wal
+wal -n -i "$IMAGE" || {
+    echo "Error: wal failed."
+    exit 1
+}
+
+
+# Escape slashes for use in sed
+ESCAPED_IMAGE=$(printf '%s\n' "$IMAGE" | sed 's/[\/&]/\\&/g')
+
+# Replace if WALLPAPER exists, otherwise append it
+if grep -q "^export WALLPAPER=" "$ZPROFILE"; then
+    sed -i "s|^export WALLPAPER=.*$|export WALLPAPER=\"$IMAGE\"|" "$ZPROFILE"
+else
+    echo "export WALLPAPER=\"$IMAGE\"" >> "$ZPROFILE"
+fi
+
+echo "WALLPAPER updated and ~/.zprofile modified."
+
+killall dwm
+
